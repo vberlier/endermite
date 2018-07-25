@@ -32,5 +32,11 @@ setup(
 
     packages=find_packages(),
 
-    install_requires=dependencies
+    install_requires=dependencies,
+
+    entry_points={
+        'console_scripts': [
+            'ender=endermite.cli:ender',
+        ],
+    },
 )
