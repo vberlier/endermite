@@ -1,5 +1,9 @@
 # endermite
 
+[![Build Status](https://travis-ci.com/vberlier/endermite.svg?branch=master)](https://travis-ci.com/vberlier/endermite)
+[![PyPI Version](https://img.shields.io/pypi/v/endermite.svg)](https://pypi.org/project/endermite/)
+[![Python Version](https://img.shields.io/pypi/pyversions/endermite.svg)](https://pypi.org/project/endermite/)
+
 > A high-level, opinionated python framework for building Minecraft data packs.
 
 **🚧 This is a huge work in progress 🚧**
