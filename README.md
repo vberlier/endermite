@@ -4,7 +4,7 @@
 [![PyPI Version](https://img.shields.io/pypi/v/endermite.svg)](https://pypi.org/project/endermite/)
 [![Python Version](https://img.shields.io/pypi/pyversions/endermite.svg)](https://pypi.org/project/endermite/)
 
-> A high-level, opinionated python framework for building Minecraft data packs.
+> A high-level, opinionated python framework for building [Minecraft data packs](https://minecraft.gamepedia.com/Data_pack).
 
 **🚧 This is a huge work in progress 🚧**
 
