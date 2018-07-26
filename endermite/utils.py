@@ -1,3 +1,6 @@
+__all__ = ['underscore', 'import_submodules', 'delete_cache']
+
+import sys
 import re
 from importlib import import_module
 from importlib.resources import contents, is_resource
@@ -40,3 +43,10 @@ def import_submodules(package):
             except TypeError:
                 continue
             import_module(f'{package}.{name}')
+
+
+def delete_cache(package):
+    modules = [mod for mod in sys.modules
+               if mod == package or mod.startswith(package + '.')]
+    for mod in modules:
+        del sys.modules[mod]
