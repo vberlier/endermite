@@ -6,9 +6,12 @@ from .utils import underscore
 
 
 class Resource:
+    registries = set()
+
     def __init_subclass__(cls, registry=False):
         if registry:
             cls.registry = defaultdict(dict)
+            cls.registries.add(cls.registry)
             return
 
         registry = getattr(cls, 'registry', None)
@@ -24,6 +27,6 @@ class Resource:
         resources[name] = cls
 
     @classmethod
-    def clear_registry(cls):
-        if hasattr(cls, 'registry'):
-            cls.registry.clear()
+    def clear_registries(cls):
+        for registry in cls.registries:
+            registry.clear()
