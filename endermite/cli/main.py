@@ -1,6 +1,7 @@
 import click
 
 from .utils import display_version
+from .init import init
 
 
 def print_version(ctx, _param, value):
@@ -15,3 +16,6 @@ def print_version(ctx, _param, value):
               callback=print_version, help='Show the version and exit.')
 def ender():
     """Command-line utility to manage endermite projects."""
+
+
+ender.add_command(init)
