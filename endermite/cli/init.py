@@ -4,6 +4,7 @@ from textwrap import dedent
 from keyword import iskeyword
 import click
 
+from endermite import Project
 from endermite.utils import underscore
 
 from .utils import display_version, load_level_data, project_already_exists
@@ -17,16 +18,12 @@ PROJECT_TEMPLATE = {
 
         {name} = Project(
             name={name!r},
+            project_id={project_id!r},
             description={description!r},
             author={author!r},
             version={version!r},
-            project_id={project_id!r},
-            **find_resources()
+            **find_resources(__name__)
         )
-
-
-        if __name__ == '__main__':
-            {name}.build()
     """,
     'hello.py': """
         from endermite import StaticComponent
@@ -70,10 +67,10 @@ def init():
     if project_already_exists(default_name):
         default_name = None
 
-    name = click.prompt('Project name', default=default_name, type=identifier)
-    description = click.prompt('Project description', default='...')
-    author = click.prompt('Project author', default='N/A')
-    version = click.prompt('Project version', default='0.1.0')
+    name = click.prompt('Project name', default_name, type=identifier)
+    description = click.prompt('Project description', Project.description)
+    author = click.prompt('Project author', Project.author)
+    version = click.prompt('Project version', Project.version)
 
     project_id = secrets.token_hex(3)
 
