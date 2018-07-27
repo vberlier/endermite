@@ -24,6 +24,7 @@ def underscore(string):
 
 
 def import_submodules(package):
+    """Import all the submodules of a given package."""
     try:
         import_module(package)
         entries = contents(package)
@@ -46,6 +47,7 @@ def import_submodules(package):
 
 
 def delete_cache(package):
+    """Remove a package and all its submodules from the module cache."""
     modules = [mod for mod in sys.modules
                if mod == package or mod.startswith(package + '.')]
     for mod in modules:
