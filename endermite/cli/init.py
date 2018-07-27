@@ -56,7 +56,7 @@ def identifier(value):
 def init():
     """Create a new endermite project."""
     display_version()
-    click.echo('\nCreating a new endermite project.')
+    click.echo('\nCreating endermite project.')
 
     level_data = load_level_data()
     if not level_data:
