@@ -8,6 +8,7 @@ from endermite import Project
 from endermite.resource import Resource
 from endermite.utils import delete_cache
 
+from .watch import watch_directory
 from .utils import display_version, display_error, load_level_data, public_modules
 from .config import ENDERMITE_FOLDER_PATH, DATAPACKS_FOLDER_PATH
 
@@ -40,7 +41,24 @@ def build(watch):
         formatted_dir = click.style(str(source_path), fg='blue', bold=True)
         click.echo(f'\nWatching directory {formatted_dir}.')
 
-        # FIXME
+        try:
+            for changes in watch_directory(source_path):
+                count = len(changes)
+                if count == 1:
+                    text = changes[0].format(source_path)
+                else:
+                    text = f'{count} changes detected'
+
+                now = time.strftime('%H:%M:%S')
+                change_time = click.style(now, fg='blue', bold=True)
+
+                click.echo(f'\n{change_time} {text}')
+
+                for module_path in public_modules(source_path):
+                    if not build_project(module_path, output_path):
+                        break
+        except KeyboardInterrupt:
+            click.secho('\nExit.', fg='blue', bold=True)
     else:
         for module_path in public_modules(source_path):
             if not build_project(module_path, output_path):
