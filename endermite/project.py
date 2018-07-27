@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from mcpack import DataPack
 
 from .component import Component, StaticComponent
+from .error import build_guard
 from .utils import import_submodules
 
 
@@ -31,8 +32,9 @@ class Project:
 
     def build(self):
         """Build the project and return the generated data pack."""
-        pack = DataPack(
-            self.name,
-            f'{self.description}\n\nVersion {self.version}\nBy {self.author}'
-        )
-        return pack
+        with build_guard(f'project "{self.name}"'):
+            pack = DataPack(
+                self.name,
+                f'{self.description}\n\nVersion {self.version}\nBy {self.author}'
+            )
+            return pack

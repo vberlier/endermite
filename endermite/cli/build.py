@@ -1,21 +1,16 @@
 import sys
 import time
-from traceback import print_exception
 from importlib import import_module
 import click
 
 from endermite import Project
 from endermite.resource import Resource
+from endermite.error import BuildError, crop_traceback_until, print_exc
 from endermite.utils import delete_cache
 
 from .watch import watch_directory
 from .utils import display_version, display_error, load_level_data, public_modules
 from .config import ENDERMITE_FOLDER_PATH, DATAPACKS_FOLDER_PATH
-
-
-def print_exc(exc):
-    """Display an exception."""
-    print_exception(exc.__class__, exc, exc.__traceback__)
 
 
 @click.command()
@@ -82,6 +77,14 @@ def build_project(module_path, output_path):
             return True
 
         project.build().dump(output_path, overwrite=True)
+
+    except BuildError as exc:
+        display_error(f'Couldn\'t build {exc}, traceback below.')
+        click.echo()
+        exc = exc.__cause__
+        crop_traceback_until(exc, module_path)
+        print_exc(exc)
+        return False
 
     except Exception as exc: # pylint: disable = broad-except
         display_error('Build failed, traceback below.')
