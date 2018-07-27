@@ -5,7 +5,6 @@ from traceback import print_exception
 
 class BuildError(Exception):
     """Raised from another exception with some context information."""
-    pass
 
 
 @contextmanager
