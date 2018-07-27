@@ -3,9 +3,9 @@ __all__ = ['Component', 'StaticComponent']
 from .resource import Resource
 
 
-class Component(Resource, registry=True):
+class Component(Resource, create_registry=True):
     pass
 
 
-class StaticComponent(Resource, registry=True):
+class StaticComponent(Resource, create_registry=True):
     pass

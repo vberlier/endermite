@@ -12,8 +12,8 @@ def find_resources(package):
     """Load the package's submodules and return the defined resources."""
     import_submodules(package)
     return {
-        'components': Component.registry[package],
-        'static_components': StaticComponent.registry[package],
+        'components': Component.registry[package].copy(),
+        'static_components': StaticComponent.registry[package].copy(),
     }
 
 
