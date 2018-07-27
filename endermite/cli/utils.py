@@ -57,3 +57,12 @@ def load_level_data():
 def project_already_exists(project_name):
     """Check if a project already exists."""
     return (ENDERMITE_FOLDER_PATH / project_name).is_dir()
+
+
+def public_modules(path):
+    """Yield all the paths to public modules in a given directory."""
+    for entry in path.iterdir():
+        if entry.name.startswith('_'):
+            continue
+        if entry.is_dir() or entry.is_file() and entry.suffix == '.py':
+            yield entry
