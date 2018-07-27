@@ -2,6 +2,7 @@ import click
 
 from .utils import display_version
 from .init import init
+from .build import build
 
 
 def print_version(ctx, _param, value):
@@ -19,3 +20,4 @@ def ender():
 
 
 ender.add_command(init)
+ender.add_command(build)
