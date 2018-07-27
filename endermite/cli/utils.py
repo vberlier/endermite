@@ -40,7 +40,7 @@ def load_level_data():
         display_error(f'Couldn\'t find any "{LEVEL_DATA_PATH}" file. Are you '
                       'sure that the current directory is a minecraft '
                       'world folder?')
-    except BaseException:
+    except Exception: # pylint: disable = broad-except
         display_error(f'Couldn\'t load level data "{LEVEL_DATA_PATH}".')
     else:
         world_version = level_data.get('Version', {'Id': 0, 'Name': 'unknown'})
