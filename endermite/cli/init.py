@@ -56,14 +56,15 @@ def identifier(value):
 def init():
     """Create a new endermite project."""
     display_version()
-    click.echo('\nCreating a new endermite project.\n')
+    click.echo('\nCreating a new endermite project.')
 
     level_data = load_level_data()
     if not level_data:
         sys.exit(1)
 
-    default_name = underscore(level_data['LevelName'])
+    click.echo()
 
+    default_name = underscore(level_data['LevelName'])
     if project_already_exists(default_name):
         default_name = None
 
