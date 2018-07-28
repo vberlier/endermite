@@ -1,11 +1,11 @@
-__all__ = ['Component', 'StaticComponent']
+__all__ = ['Component', 'ComponentBuilder']
 
-from .resource import Resource
+from .resource import AutoRegisteringResourceClass, ResourceBuilder
 
 
-class Component(Resource, create_registry=True):
+class Component(AutoRegisteringResourceClass):
     pass
 
 
-class StaticComponent(Resource, create_registry=True):
-    pass
+class ComponentBuilder(ResourceBuilder):
+    guard_name = 'component'

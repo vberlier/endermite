@@ -4,7 +4,7 @@ from importlib import import_module
 import click
 
 from endermite import Project
-from endermite.resource import Resource
+from endermite.resource import clear_registries
 from endermite.error import BuildError, crop_traceback_until, print_exc
 from endermite.utils import delete_cache
 
@@ -101,4 +101,4 @@ def build_project(module_path, output_path):
 
     finally:
         delete_cache(project_name)
-        Resource.clear_registries()
+        clear_registries()
