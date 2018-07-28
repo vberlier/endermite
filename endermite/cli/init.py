@@ -26,14 +26,14 @@ PROJECT_TEMPLATE = {
         )
     """,
     'hello.py': """
-        from endermite import StaticComponent
+        from endermite import Component
         from endermite.decorators import *
 
 
-        class Hello(StaticComponent):
-            \"""Output `Hello, world!` when the data pack is loaded.\"""
+        class Hello(Component):
+            \"""Output `Hello, world!` each tick when attached to an entity.\"""
 
-            @load
+            @tick
             @public
             def say_hello(self):
                 self.say('Hello, world!')
