@@ -5,7 +5,7 @@ import click
 
 from endermite import Project
 from endermite.resource import clear_registries
-from endermite.error import BuildError, crop_traceback_until, print_exc
+from endermite.error import BuildError, crop_traceback_until, print_exc, build_guard
 from endermite.utils import delete_cache
 
 from .watch import watch_directory
@@ -68,7 +68,8 @@ def build_project(module_path, output_path):
     click.echo(f'\nAttempting to build "{project_name}"...')
 
     try:
-        module = import_module(project_name)
+        with build_guard(f'module "{project_name}"'):
+            module = import_module(project_name)
         project = getattr(module, project_name, None)
 
         if not isinstance(project, Project):
