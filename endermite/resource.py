@@ -13,7 +13,15 @@ def clear_registries():
         registry.clear()
 
 
-class AutoRegisteringResourceClass:
+class MemberGatheringMeta(type):
+    def __new__(cls, name, bases, dct):
+        names = [name for name in dct if not name.startswith('_')]
+        new_class = super().__new__(cls, name, bases, dct)
+        new_class.defined_members = names
+        return new_class
+
+
+class AutoRegisteringResourceClass(metaclass=MemberGatheringMeta):
     """Auto-register class-based project resources when subclassed."""
     registries = []
 
