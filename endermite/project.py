@@ -1,4 +1,4 @@
-__all__ = ['Project', 'ProjectBuilder', 'find_resources']
+__all__ = ['Project', 'find_resources']
 
 from typing import Dict
 from dataclasses import dataclass, field
