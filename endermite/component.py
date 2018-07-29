@@ -33,9 +33,14 @@ class ComponentBuilder(ResourceBuilder):
 
     def build(self):
         instance = self.resource(context=self.ctx)
+        methods = {}
+
         for name in instance.defined_members:
             member = getattr(instance, name)
 
             if isinstance(getattr(member, 'data', None), FunctionData):
                 if 'visibility' in member.data:
-                    self.delegate(ComponentMethodBuilder, name, member)
+                    methods[name] = member
+
+        for name, method in methods.items():
+            self.delegate(ComponentMethodBuilder, name, method)
