@@ -9,11 +9,19 @@ class ContextAwareMixin:
         self.ctx = context
 
 
+class Command(tuple):
+    """Hold the different parts of a minecraft command."""
+    __slots__ = ()
+
+    def __str__(self):
+        return ' '.join(map(str, self))
+
+
 class CommandMixin(ContextAwareMixin):
     """Expose context-modifying methods that mirror minecraft commands."""
 
-    def _run(self, command_object):
-        self.ctx[FunctionBuilder].register_command(command_object)
+    def run(self, *args):
+        self.ctx[FunctionBuilder].register_command(Command(args))
 
     def say(self, *args, sep=' '):
-        self._run('say ' + sep.join(map(str, args)))  # TEMPORARY
+        self.run('say', sep.join(map(str, args)))
