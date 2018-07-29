@@ -1,27 +1,21 @@
 __all__ = ['public', 'private', 'tag', 'tick', 'load', 'init']
 
 
-# Visibility decorators
-
-
 def public(func):
     """Set the visibility of a given function to `public`."""
-    return DecoratedFunction.update(func, visibility='public')
+    return FunctionData.update_data(func, visibility='public')
 
 
 def private(func):
     """Set the visibility of a given function to `private`."""
-    return DecoratedFunction.update(func, visibility='private')
-
-
-# Tag decorators
+    return FunctionData.update_data(func, visibility='private')
 
 
 def tag(value):
     """Return a decorator that appends a given tag to a function."""
     def decorator(func):
         """Append the tag to a given function."""
-        return DecoratedFunction.append(func, tag=value)
+        return FunctionData.append_data(func, tag=value)
     return decorator
 
 
@@ -31,39 +25,27 @@ load = tag('minecraft:load')
 init = tag('endermite:init')
 
 
-# Underlying class that stores data for the decorated function
-
-
-class DecoratedFunction:
-    """Encapsulate a function to store extra information."""
-
-    def __init__(self, func):
-        self.func = func
-        self.data = {}
-
-    def __call__(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
+class FunctionData(dict):
+    """Can be attached to a function to store extra information."""
 
     @classmethod
-    def _decorate(cls, func):
-        return func if isinstance(func, cls) else cls(func)
+    def _ensure_data(cls, func):
+        if not hasattr(func, 'data'):
+            func.data = cls()
 
     @classmethod
-    def update(cls, func, **kwargs):
+    def update_data(cls, func, **kwargs):
         """Update the given key-value pairs."""
-        func = cls._decorate(func)
+        cls._ensure_data(func)
         func.data.update(kwargs)
         return func
 
     @classmethod
-    def append(cls, func, **kwargs):
+    def append_data(cls, func, **kwargs):
         """Append each value to a list stored under the associated key."""
-        func = cls._decorate(func)
+        cls._ensure_data(func)
         for key, value in kwargs.items():
             current = func.data.get(key, [])
             current.append(value)
             func.data[key] = current
         return func
-
-    def __repr__(self):
-        return f'{self.__class__.__qualname__}({self.func!r}, data={self.data!r})'
