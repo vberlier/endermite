@@ -14,6 +14,8 @@ def clear_registries():
 
 
 class MemberGatheringMeta(type):
+    """Metaclass that gathers all the members defined in the class body."""
+
     def __new__(cls, name, bases, dct):
         names = [name for name in dct if not name.startswith('_')]
         new_class = super().__new__(cls, name, bases, dct)
