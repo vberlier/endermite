@@ -13,7 +13,7 @@ class CommandMixin(ContextAwareMixin):
     """Expose context-modifying methods that mirror minecraft commands."""
 
     def _run(self, command_object):
-        self.ctx[FunctionBuilder].resource.append(command_object)
+        self.ctx[FunctionBuilder].register_command(command_object)
 
     def say(self, *args, sep=' '):
         self._run('say ' + sep.join(map(str, args)))  # TEMPORARY
