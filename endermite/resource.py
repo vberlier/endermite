@@ -89,6 +89,11 @@ class ResourceBuilder(list):
     def build(self):
         """Build the given resource."""
 
+    def delegate(self, builder_class, name, resource):
+        """Delegate the building of a sub-resource to a child builder."""
+        with builder_class(self.ctx, name, resource).current() as builder:
+            builder.build()
+
     def populate(self, pack):
         """Populate the data pack with what was built from the resource."""
         if self.__class__.child_builders:

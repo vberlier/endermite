@@ -53,9 +53,8 @@ class ProjectBuilder(ResourceBuilder):
                             f'Version {self.resource.version}\n'
                             f'By {self.resource.author}')
 
-        for name, resource in self.resource.components.items():
-            with ComponentBuilder(self.ctx, name, resource).current() as builder:
-                builder.build()
+        for name, component_class in self.resource.components.items():
+            self.delegate(ComponentBuilder, name, component_class)
 
     def create_data_pack(self):
         return DataPack(self.name, self.description)
