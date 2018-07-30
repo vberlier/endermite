@@ -1,5 +1,4 @@
 import sys
-import secrets
 from textwrap import dedent
 from keyword import iskeyword
 import click
@@ -18,7 +17,6 @@ PROJECT_TEMPLATE = {
 
         {name} = Project(
             name={name!r},
-            project_id={project_id!r},
             description={description!r},
             author={author!r},
             version={version!r},
@@ -73,8 +71,6 @@ def init():
     author = click.prompt('Project author', Project.author)
     version = click.prompt('Project version', Project.version)
 
-    project_id = secrets.token_hex(3)
-
     project_path = (ENDERMITE_FOLDER_PATH / name).absolute()
     click.echo('\nAbout to create '
                + click.style(str(project_path), fg='blue', bold=True)
@@ -83,11 +79,11 @@ def init():
     if not click.confirm('Is this ok?', default=True):
         raise click.Abort()
 
-    setup_project(name, description, author, version, project_id)
+    setup_project(name, description, author, version)
     click.secho('\nDone!', fg='green', bold=True)
 
 
-def setup_project(name, description, author, version, project_id):
+def setup_project(name, description, author, version):
     """Setup an endermite project."""
     project_path = ENDERMITE_FOLDER_PATH / name
     project_path.mkdir(parents=True, exist_ok=True)
@@ -99,5 +95,4 @@ def setup_project(name, description, author, version, project_id):
             description=description,
             author=author,
             version=version,
-            project_id=project_id
         ))

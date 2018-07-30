@@ -22,7 +22,6 @@ class Project:
     """Class representing an endermite project."""
 
     name: str
-    project_id: str
     description: str = 'An endermite project'
     author: str = 'N/A'
     version: str = '0.1.0'
