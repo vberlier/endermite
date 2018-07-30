@@ -13,19 +13,11 @@ def clear_registries():
         registry.clear()
 
 
-class MemberGatheringMeta(type):
-    """Metaclass that gathers all the members defined in the class body."""
-
-    def __new__(cls, name, bases, dct):
-        names = [name for name in dct if not name.startswith('_')]
-        new_class = super().__new__(cls, name, bases, dct)
-        new_class.defined_members = names
-        return new_class
-
-
-class AutoRegisteringResourceClass(metaclass=MemberGatheringMeta):
+class AutoRegisteringResourceClass:
     """Auto-register class-based project resources when subclassed."""
     registries = []
+    module = ''
+    name = ''
 
     def __init_subclass__(cls):
         if cls.__base__ is AutoRegisteringResourceClass:
@@ -37,13 +29,13 @@ class AutoRegisteringResourceClass(metaclass=MemberGatheringMeta):
         if registry is None:
             return
 
-        module = cls.__module__.partition('.')[0]
-        name = underscore(cls.__name__)
+        cls.module = cls.__module__.partition('.')[0]
+        cls.name = underscore(cls.__name__)
 
-        resources = registry[module]
-        if name in resources:
-            raise TypeError(f'{cls.__base__.__name__} "{name}" already exists')
-        resources[name] = cls
+        resources = registry[cls.module]
+        if cls.name in resources:
+            raise TypeError(f'{cls.__base__.__name__} "{cls.name}" already exists')
+        resources[cls.name] = cls
 
 
 class ResourceBuilder(list):

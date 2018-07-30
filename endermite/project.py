@@ -1,6 +1,6 @@
 __all__ = ['Project', 'find_resources']
 
-from typing import Dict
+from typing import List
 from dataclasses import dataclass, field
 from mcpack import DataPack
 
@@ -13,7 +13,7 @@ def find_resources(package):
     """Load the package's submodules and return the defined resources."""
     import_submodules(package)
     return {
-        'components': Component.registry[package].copy(),
+        'components': list(Component.registry[package].values()),
     }
 
 
@@ -26,7 +26,7 @@ class Project:
     description: str = 'An endermite project'
     author: str = 'N/A'
     version: str = '0.1.0'
-    components: Dict[str, Component] = field(default_factory=dict)
+    components: List[Component] = field(default_factory=list)
 
     def build(self):
         """Build the project and return the generated data pack."""
@@ -53,8 +53,8 @@ class ProjectBuilder(ResourceBuilder):
                             f'Version {self.resource.version}\n'
                             f'By {self.resource.author}')
 
-        for name, component_class in self.resource.components.items():
-            self.delegate(ComponentBuilder, name, component_class)
+        for component in self.resource.components:
+            self.delegate(ComponentBuilder, component.name, component)
 
     def create_data_pack(self):
         return DataPack(self.name, self.description)

@@ -8,7 +8,40 @@ from .mixins import CommandMixin
 from .decorators import FunctionData
 
 
-class Component(AutoRegisteringResourceClass, CommandMixin):
+def patched_method(method):
+    @wraps(method)
+    def wrapper(self):
+        self.run('function', method.data['function_name'])
+    return wrapper
+
+
+class ComponentMeta(type):
+    def __new__(cls, cls_name, bases, dct):
+        defined_members = [name for name in dct if not name.startswith('_')]
+        methods = {}
+
+        for name in defined_members:
+            member = dct[name]
+
+            if isinstance(getattr(member, 'data', None), FunctionData):
+                if 'visibility' in member.data:
+                    methods[name] = member
+                    dct[name] = patched_method(member)
+
+        dct['component_methods'] = methods
+        return super().__new__(cls, cls_name, bases, dct)
+
+    def __init__(cls, cls_name, bases, dct):
+        super().__init__(cls_name, bases, dct)
+        prefix = f'{cls.module}:component/{cls.name}/'
+
+        for name, method in cls.component_methods.items():
+            if method.data['visibility'] == 'private':
+                name = '_private/' + name
+            FunctionData.update_data(method, function_name=prefix + name)
+
+
+class Component(AutoRegisteringResourceClass, CommandMixin, metaclass=ComponentMeta):
     pass
 
 
@@ -17,42 +50,22 @@ class ComponentMethodBuilder(ResourceBuilder):
     guard_name = 'component method'
 
     def build(self):
-        full_name = self.resource.data['full_name']
-        with FunctionBuilder(self.ctx, full_name, []).current() as builder:
-            self.resource()
+        function_name = self.resource.data['function_name']
+        with FunctionBuilder(self.ctx, function_name, []).current() as builder:
+            self.resource(self.parent.instance)
             builder.build()
-
-
-def patched_method(self, method, full_name):
-    @wraps(method)
-    def wrapper():
-        self.run('function', full_name)
-    return wrapper
 
 
 class ComponentBuilder(ResourceBuilder):
     child_builders = (ComponentMethodBuilder,)
     guard_name = 'component'
 
+    def __init__(self, ctx, name, resource):
+        super().__init__(ctx, name, resource)
+        self.instance = None
+
     def build(self):
-        instance = self.resource(context=self.ctx)
-        methods = {}
+        self.instance = self.resource(context=self.ctx)
 
-        for name in instance.defined_members:
-            member = getattr(instance, name)
-
-            if isinstance(getattr(member, 'data', None), FunctionData):
-                if 'visibility' in member.data:
-                    methods[name] = member
-                    self.set_full_name(name, member)
-                    setattr(instance, name, patched_method(instance, member,
-                                                           member.data['full_name']))
-
-        for name, method in methods.items():
+        for name, method in self.resource.component_methods.items():
             self.delegate(ComponentMethodBuilder, name, method)
-
-    def set_full_name(self, name, method):
-        prefix = f'{self.parent.name}:component/{self.name}/'
-        if method.data['visibility'] == 'private':
-            name = '_private/' + name
-        FunctionData.update_data(method, full_name=prefix + name)
