@@ -14,7 +14,7 @@ class Command(tuple):
     __slots__ = ()
 
     def __str__(self):
-        return ' '.join(map(str, self))
+        return ' '.join(str(arg).replace('\n', ' ').strip() for arg in self)
 
 
 class CommandMixin(ContextAwareMixin):
