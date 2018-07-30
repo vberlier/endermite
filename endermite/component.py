@@ -46,7 +46,6 @@ class Component(AutoRegisteringResourceClass, CommandMixin, metaclass=ComponentM
 
 
 class ComponentMethodBuilder(ResourceBuilder):
-    child_builders = (FunctionBuilder, FunctionTagBuilder)
     guard_name = 'component method'
 
     def build(self):
@@ -61,7 +60,6 @@ class ComponentMethodBuilder(ResourceBuilder):
 
 
 class ComponentBuilder(ResourceBuilder):
-    child_builders = (ComponentMethodBuilder,)
     guard_name = 'component'
 
     def __init__(self, parent, name, resource):

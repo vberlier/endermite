@@ -40,7 +40,6 @@ class Project:
 
 
 class ProjectBuilder(ResourceBuilder):
-    child_builders = (ComponentBuilder,)
     guard_name = 'project'
 
     def __init__(self, name, resource):

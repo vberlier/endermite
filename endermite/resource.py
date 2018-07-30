@@ -40,16 +40,7 @@ class AutoRegisteringResourceClass:
 
 class ResourceBuilder(list):
     """Recursive project resource builder."""
-    child_builders = ()
     guard_name = 'resource'
-
-    @classmethod
-    def make_context(cls):
-        """Return an empty build context appropriate for the builder type."""
-        ctx = {cls: None}
-        for builder_class in cls.child_builders:
-            ctx.update(builder_class.make_context())
-        return ctx
 
     def __init__(self, parent, name, resource):
         super().__init__()
@@ -61,7 +52,7 @@ class ResourceBuilder(list):
             self.ctx = parent.ctx
             parent.append(self)
         else:
-            self.ctx = self.make_context()
+            self.ctx = defaultdict(lambda: None)
 
     @contextmanager
     def current(self):
@@ -84,9 +75,8 @@ class ResourceBuilder(list):
 
     def populate(self, pack):
         """Populate the data pack with what was built from the resource."""
-        if self.__class__.child_builders:
-            for builder in self:
-                builder.populate(pack)
+        for builder in self:
+            builder.populate(pack)
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self.name!r}, {super().__repr__()})'
