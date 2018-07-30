@@ -29,7 +29,7 @@ class Project:
 
     def build(self):
         """Build the project and return the generated data pack."""
-        builder = ProjectBuilder(ProjectBuilder.context(), self.name, self)
+        builder = ProjectBuilder(self.name, self)
 
         with builder.current():
             builder.build()
@@ -43,8 +43,8 @@ class ProjectBuilder(ResourceBuilder):
     child_builders = (ComponentBuilder,)
     guard_name = 'project'
 
-    def __init__(self, ctx, name, resource):
-        super().__init__(ctx, name, resource)
+    def __init__(self, name, resource):
+        super().__init__(None, name, resource)
         self.description = ''
 
     def build(self):

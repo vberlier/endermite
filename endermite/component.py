@@ -51,7 +51,7 @@ class ComponentMethodBuilder(ResourceBuilder):
 
     def build(self):
         function_name = self.resource.data['function_name']
-        with FunctionBuilder(self.ctx, function_name, []).current() as builder:
+        with FunctionBuilder(self, function_name, []).current() as builder:
             self.resource(self.parent.instance)
             builder.build()
 
@@ -64,8 +64,8 @@ class ComponentBuilder(ResourceBuilder):
     child_builders = (ComponentMethodBuilder,)
     guard_name = 'component'
 
-    def __init__(self, ctx, name, resource):
-        super().__init__(ctx, name, resource)
+    def __init__(self, parent, name, resource):
+        super().__init__(parent, name, resource)
         self.instance = None
 
     def build(self):

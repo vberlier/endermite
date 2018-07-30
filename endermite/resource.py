@@ -40,42 +40,28 @@ class AutoRegisteringResourceClass:
 
 class ResourceBuilder(list):
     """Recursive project resource builder."""
-    parent_builder = None
     child_builders = ()
     guard_name = 'resource'
 
-    def __init_subclass__(cls):
-        for builder_class in cls.child_builders:
-            builder_class.parent_builder = cls
-
     @classmethod
-    def context(cls):
+    def make_context(cls):
         """Return an empty build context appropriate for the builder type."""
         ctx = {cls: None}
         for builder_class in cls.child_builders:
-            ctx.update(builder_class.context())
+            ctx.update(builder_class.make_context())
         return ctx
 
-    def __new__(cls, ctx, name, resource):
-        if cls.parent_builder:
-            parent = ctx[cls.parent_builder]
-            if parent is None:
-                raise TypeError(f'Cannot create {cls.__name__} '
-                                f'"{name}", there is no current '
-                                f'{cls.parent_builder.__name__}')
-
-            self = super().__new__(cls, ctx, name, resource)
-            parent.append(self)
-            return self
-
-        return super().__new__(cls, ctx, name, resource)
-
-    def __init__(self, ctx, name, resource):
+    def __init__(self, parent, name, resource):
         super().__init__()
-        self.ctx = ctx
         self.name = name
         self.resource = resource
-        self.parent = ctx.get(self.parent_builder, None)
+        self.parent = parent
+
+        if isinstance(parent, ResourceBuilder):
+            self.ctx = parent.ctx
+            parent.append(self)
+        else:
+            self.ctx = self.make_context()
 
     @contextmanager
     def current(self):
@@ -93,7 +79,7 @@ class ResourceBuilder(list):
 
     def delegate(self, builder_class, name, resource):
         """Delegate the building of a sub-resource to a child builder."""
-        with builder_class(self.ctx, name, resource).current() as builder:
+        with builder_class(self, name, resource).current() as builder:
             builder.build()
 
     def populate(self, pack):
