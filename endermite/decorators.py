@@ -11,6 +11,10 @@ def private(func):
     return FunctionData.update_data(func, visibility='private')
 
 
+def init(func):
+    return FunctionData.update_data(func, init=True)
+
+
 def tag(value):
     """Return a decorator that appends a given tag to a function."""
     def decorator(func):
@@ -22,7 +26,6 @@ def tag(value):
 # pylint: disable = invalid-name
 tick = tag('minecraft:tick')
 load = tag('minecraft:load')
-init = tag('endermite:init')
 
 
 class FunctionData(dict):
