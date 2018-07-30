@@ -56,7 +56,8 @@ def load_level_data():
 
 def project_already_exists(project_name):
     """Check if a project already exists."""
-    return (ENDERMITE_FOLDER_PATH / project_name).is_dir()
+    return ((ENDERMITE_FOLDER_PATH / project_name).is_dir()
+            or (ENDERMITE_FOLDER_PATH / f'{project_name}.py').is_file())
 
 
 def public_modules(path):
