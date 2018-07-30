@@ -1,6 +1,6 @@
 __all__ = ['FunctionBuilder']
 
-from mcpack import Function
+from mcpack import Function, FunctionTag
 
 from . import __version__
 from .resource import ResourceBuilder
@@ -22,3 +22,22 @@ class FunctionBuilder(ResourceBuilder):
 
     def populate(self, pack):
         pack[self.name] = Function(self.function_body)
+
+
+class FunctionTagBuilder(ResourceBuilder):
+    guard_name = 'function tag'
+
+    def __init__(self, ctx, name, resource):
+        super().__init__(ctx, name, resource)
+        self.values = []
+
+    def build(self):
+        self.values.extend(map(str, self.resource))
+
+    def populate(self, pack):
+        namespace, name = self.name.split(':')
+        tags = pack[namespace].function_tags
+
+        function_tag = tags.get(name, FunctionTag([]))
+        function_tag.values.extend(self.values)
+        tags[name] = function_tag

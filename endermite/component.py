@@ -3,7 +3,7 @@ __all__ = ['Component', 'ComponentBuilder']
 from functools import wraps
 
 from .resource import AutoRegisteringResourceClass, ResourceBuilder
-from .function import FunctionBuilder
+from .function import FunctionBuilder, FunctionTagBuilder
 from .mixins import CommandMixin
 from .decorators import FunctionData
 
@@ -46,7 +46,7 @@ class Component(AutoRegisteringResourceClass, CommandMixin, metaclass=ComponentM
 
 
 class ComponentMethodBuilder(ResourceBuilder):
-    child_builders = (FunctionBuilder,)
+    child_builders = (FunctionBuilder, FunctionTagBuilder)
     guard_name = 'component method'
 
     def build(self):
@@ -54,6 +54,10 @@ class ComponentMethodBuilder(ResourceBuilder):
         with FunctionBuilder(self.ctx, function_name, []).current() as builder:
             self.resource(self.parent.instance)
             builder.build()
+
+        tags = self.resource.data.get('tag', [])
+        for tag in tags:
+            self.delegate(FunctionTagBuilder, tag, [function_name])
 
 
 class ComponentBuilder(ResourceBuilder):
