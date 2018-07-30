@@ -4,9 +4,9 @@ from .function import FunctionBuilder
 
 
 class ContextAwareMixin:
-    def __init__(self, *args, context, **kwargs):
+    def __init__(self, *args, ctx, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ctx = context
+        self.ctx = ctx
 
 
 class Command(tuple):

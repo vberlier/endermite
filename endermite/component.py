@@ -65,7 +65,7 @@ class ComponentBuilder(ResourceBuilder):
         self.instance = None
 
     def build(self):
-        self.instance = self.resource(context=self.ctx)
+        self.instance = self.resource(ctx=self.ctx)
 
         for name, method in self.resource.component_methods.items():
             self.delegate(ComponentMethodBuilder, name, method)
