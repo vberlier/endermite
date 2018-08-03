@@ -11,12 +11,12 @@ def private(func):
     return FunctionData.update_data(func, visibility='private')
 
 
-def init(func):
-    return FunctionData.update_data(func, init=True)
-
-
-def destroy(func):
-    return FunctionData.update_data(func, destroy=True)
+def tag(value):
+    """Return a decorator that appends a given tag to a function."""
+    def decorator(func):
+        """Append the tag to a given function."""
+        return FunctionData.append_data(func, tag=value)
+    return decorator
 
 
 def tick(func):
@@ -27,12 +27,12 @@ def load(func):
     return FunctionData.update_data(func, load=True)
 
 
-def tag(value):
-    """Return a decorator that appends a given tag to a function."""
-    def decorator(func):
-        """Append the tag to a given function."""
-        return FunctionData.append_data(func, tag=value)
-    return decorator
+def init(func):
+    return FunctionData.update_data(func, init=True)
+
+
+def destroy(func):
+    return FunctionData.update_data(func, destroy=True)
 
 
 class FunctionData(dict):
