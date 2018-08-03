@@ -21,10 +21,9 @@ def underscore(string):
     return result.lower()
 
 
-def name_generator(root):
+def name_generator(string):
     for i in count():
-        name = f'{i:#08x}'[2:]
-        yield f'{root}:generated/{name}'
+        yield string.format(name=f'{i:#08x}'[2:])
 
 
 # Module
