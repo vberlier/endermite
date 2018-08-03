@@ -24,7 +24,7 @@ def underscore(string):
 def name_generator(root):
     for i in count():
         name = f'{i:#08x}'[2:]
-        yield f'{root}:_generated/{name}'
+        yield f'{root}:generated/{name}'
 
 
 # Module
