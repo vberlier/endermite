@@ -54,11 +54,12 @@ class ComponentMethodBuilder(ResourceBuilder):
             self.resource(self.component_instance)
             builder.build()
 
+        tags = self.resource.data.get('tag', [])
+
         for name, callback in self.component_callbacks.items():
             if self.resource.data.get(name, False):
-                FunctionData.append_data(self.resource, tag=callback)
+                tags.append(callback)
 
-        tags = self.resource.data.get('tag', [])
         for tag in tags:
             self.delegate(FunctionTagBuilder, tag, [function_name])
 
