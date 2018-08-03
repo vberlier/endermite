@@ -19,17 +19,20 @@ def destroy(func):
     return FunctionData.update_data(func, destroy=True)
 
 
+def tick(func):
+    return FunctionData.update_data(func, tick=True)
+
+
+def load(func):
+    return FunctionData.update_data(func, load=True)
+
+
 def tag(value):
     """Return a decorator that appends a given tag to a function."""
     def decorator(func):
         """Append the tag to a given function."""
         return FunctionData.append_data(func, tag=value)
     return decorator
-
-
-# pylint: disable = invalid-name
-tick = tag('minecraft:tick')
-load = tag('minecraft:load')
 
 
 class FunctionData(dict):

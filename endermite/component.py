@@ -54,6 +54,11 @@ class ComponentMethodBuilder(ResourceBuilder):
             self.resource(self.component_instance)
             builder.build()
 
+        if self.resource.data.get('init', False):
+            FunctionData.append_data(self.resource, tag=self.init_callback)
+        if self.resource.data.get('destroy', False):
+            FunctionData.append_data(self.resource, tag=self.destroy_callback)
+
         tags = self.resource.data.get('tag', [])
         for tag in tags:
             self.delegate(FunctionTagBuilder, tag, [function_name])
@@ -65,39 +70,35 @@ class ComponentBuilder(ResourceBuilder):
     def __init__(self, parent, name, resource):
         super().__init__(parent, name, resource)
         self.component_instance = None
+        self.init_callback = ''
+        self.destroy_callback = ''
 
     def build(self):
-        init_callback = f'{self.namespace}:callback/init/{self.name}'
-        destroy_callback = f'{self.namespace}:callback/destroy/{self.name}'
-
+        self.init_callback = f'{self.namespace}:callback/init/{self.name}'
+        self.destroy_callback = f'{self.namespace}:callback/destroy/{self.name}'
         self.component_instance = self.resource(ctx=self.ctx)
 
         for name, method in self.resource.component_methods.items():
-            if method.data.get('init', False):
-                FunctionData.append_data(method, tag=init_callback)
-            if method.data.get('destroy', False):
-                FunctionData.append_data(method, tag=destroy_callback)
-
             self.delegate(ComponentMethodBuilder, name, method)
 
         component_tag = f'{self.namespace}.component.{self.name}'
-        self.build_attach_function(component_tag, init_callback)
-        self.build_detach_function(component_tag, destroy_callback)
+        self.build_attach_function(component_tag)
+        self.build_detach_function(component_tag)
 
-    def build_attach_function(self, component_tag, init_callback):
+    def build_attach_function(self, component_tag):
         function_name = f'{self.namespace}:attach/{self.name}'
         func = self.generate_function([
             f'tag @s add {component_tag}',
-            f'function #{init_callback}',
+            f'function #{self.init_callback}',
         ])
         self.delegate(FunctionBuilder, function_name, [
             f'execute unless entity @s[tag={component_tag}] run function {func}',
         ])
 
-    def build_detach_function(self, component_tag, destroy_callback):
+    def build_detach_function(self, component_tag):
         function_name = f'{self.namespace}:detach/{self.name}'
         func = self.generate_function([
-            f'function #{destroy_callback}',
+            f'function #{self.destroy_callback}',
             f'tag @s remove {component_tag}',
         ])
         self.delegate(FunctionBuilder, function_name, [
