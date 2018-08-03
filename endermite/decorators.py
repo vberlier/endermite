@@ -1,4 +1,4 @@
-__all__ = ['public', 'private', 'tag', 'tick', 'load', 'init']
+__all__ = ['public', 'private', 'tag', 'tick', 'load', 'init', 'destroy']
 
 
 def public(func):
@@ -13,6 +13,10 @@ def private(func):
 
 def init(func):
     return FunctionData.update_data(func, init=True)
+
+
+def destroy(func):
+    return FunctionData.update_data(func, destroy=True)
 
 
 def tag(value):

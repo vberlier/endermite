@@ -67,27 +67,39 @@ class ComponentBuilder(ResourceBuilder):
         self.component_instance = None
 
     def build(self):
+        init_callback = f'{self.namespace}:callback/init/{self.name}'
+        destroy_callback = f'{self.namespace}:callback/destroy/{self.name}'
+
         self.component_instance = self.resource(ctx=self.ctx)
 
         for name, method in self.resource.component_methods.items():
+            if method.data.get('init', False):
+                FunctionData.append_data(method, tag=init_callback)
+            if method.data.get('destroy', False):
+                FunctionData.append_data(method, tag=destroy_callback)
+
             self.delegate(ComponentMethodBuilder, name, method)
 
         component_tag = f'{self.namespace}.component.{self.name}'
-        self.build_attach_function(component_tag)
-        self.build_detach_function(component_tag)
+        self.build_attach_function(component_tag, init_callback)
+        self.build_detach_function(component_tag, destroy_callback)
 
-    def build_attach_function(self, component_tag):
+    def build_attach_function(self, component_tag, init_callback):
         function_name = f'{self.namespace}:attach/{self.name}'
-        func = self.generate_function([f'tag @s add {component_tag}'])
-
+        func = self.generate_function([
+            f'tag @s add {component_tag}',
+            f'function #{init_callback}',
+        ])
         self.delegate(FunctionBuilder, function_name, [
-            f'execute unless entity @s[tag={component_tag}] run function {func}'
+            f'execute unless entity @s[tag={component_tag}] run function {func}',
         ])
 
-    def build_detach_function(self, component_tag):
+    def build_detach_function(self, component_tag, destroy_callback):
         function_name = f'{self.namespace}:detach/{self.name}'
-        func = self.generate_function([f'tag @s remove {component_tag}'])
-
+        func = self.generate_function([
+            f'tag @s remove {component_tag}',
+            f'function #{destroy_callback}',
+        ])
         self.delegate(FunctionBuilder, function_name, [
-            f'execute if entity @s[tag={component_tag}] run function {func}'
+            f'execute if entity @s[tag={component_tag}] run function {func}',
         ])
