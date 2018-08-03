@@ -6,7 +6,7 @@ from mcpack import DataPack
 
 from .component import Component, ComponentBuilder
 from .resource import ResourceBuilder
-from .utils import import_submodules
+from .utils import import_submodules, name_generator
 
 
 def find_resources(package):
@@ -45,6 +45,7 @@ class ProjectBuilder(ResourceBuilder):
     def __init__(self, name, resource):
         super().__init__(None, name, resource)
         self.description = ''
+        self.generated_function = name_generator(self.name)
 
     def build(self):
         self.description = (f'{self.resource.description}\n\n'
