@@ -2,11 +2,12 @@ __all__ = ['underscore', 'import_submodules', 'delete_cache']
 
 import sys
 import re
+from itertools import count
 from importlib import import_module
 from importlib.resources import contents, is_resource
 
 
-# String transformation
+# String
 
 
 RE_STRING_PARTS = re.compile(r'[a-z]+|[A-Z][a-z]+|[A-Z]+|[0-9]+')
@@ -18,6 +19,12 @@ def underscore(string):
     if result[0].isdigit():
         result = '_' + result
     return result.lower()
+
+
+def name_generator(root):
+    for i in count():
+        name = f'{i:#08x}'[2:]
+        yield f'{root}:_generated/{name}'
 
 
 # Module
