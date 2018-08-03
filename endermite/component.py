@@ -97,8 +97,8 @@ class ComponentBuilder(ResourceBuilder):
     def build_detach_function(self, component_tag, destroy_callback):
         function_name = f'{self.namespace}:detach/{self.name}'
         func = self.generate_function([
-            f'tag @s remove {component_tag}',
             f'function #{destroy_callback}',
+            f'tag @s remove {component_tag}',
         ])
         self.delegate(FunctionBuilder, function_name, [
             f'execute if entity @s[tag={component_tag}] run function {func}',
