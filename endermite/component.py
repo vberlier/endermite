@@ -11,7 +11,8 @@ from .decorators import FunctionData
 def patched_method(method):
     @wraps(method)
     def wrapper(self):
-        self.run('function', method.data['function_name'])
+        namespace = self.ctx[FunctionBuilder].namespace
+        self.run('function', f'{namespace}:{method.data["function_name"]}')
     return wrapper
 
 
