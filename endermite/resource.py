@@ -53,6 +53,11 @@ class ResourceBuilder(list):
         else:
             self.ctx = defaultdict(lambda: None)
 
+    def __getattr__(self, name):
+        if self.parent is not None:
+            return getattr(self.parent, name)
+        raise AttributeError(name)
+
     @contextmanager
     def current(self):
         """Temporarily set the instance as the current builder of its type."""
