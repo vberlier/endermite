@@ -16,7 +16,6 @@ def clear_registries():
 class AutoRegisteringResourceClass:
     """Auto-register class-based project resources when subclassed."""
     registries = []
-    module = ''
     name = ''
 
     def __init_subclass__(cls):
@@ -29,10 +28,10 @@ class AutoRegisteringResourceClass:
         if registry is None:
             return
 
-        cls.module = cls.__module__.partition('.')[0]
+        module = cls.__module__.partition('.')[0]
         cls.name = underscore(cls.__name__)
 
-        resources = registry[cls.module]
+        resources = registry[module]
         if cls.name in resources:
             raise TypeError(f'{cls.__base__.__name__} "{cls.name}" already exists')
         resources[cls.name] = cls

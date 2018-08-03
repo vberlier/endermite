@@ -33,7 +33,7 @@ class ComponentMeta(type):
 
     def __init__(cls, cls_name, bases, dct):
         super().__init__(cls_name, bases, dct)
-        prefix = f'{cls.module}:component/{cls.name}/'
+        prefix = f'component/{cls.name}/'
 
         for name, method in cls.component_methods.items():
             if method.data['visibility'] == 'private':
@@ -48,10 +48,15 @@ class Component(AutoRegisteringResourceClass, CommandMixin, metaclass=ComponentM
 class ComponentMethodBuilder(ResourceBuilder):
     guard_name = 'component method'
 
+    def __init__(self, parent, name, resource):
+        super().__init__(parent, name, resource)
+        self.instance = self.parent.instance
+        self.namespace = self.parent.namespace
+
     def build(self):
-        function_name = self.resource.data['function_name']
+        function_name = self.namespace + self.resource.data['function_name']
         with FunctionBuilder(self, function_name, []).current() as builder:
-            self.resource(self.parent.instance)
+            self.resource(self.instance)
             builder.build()
 
         tags = self.resource.data.get('tag', [])
@@ -65,6 +70,7 @@ class ComponentBuilder(ResourceBuilder):
     def __init__(self, parent, name, resource):
         super().__init__(parent, name, resource)
         self.instance = None
+        self.namespace = self.parent.name + ':'
 
     def build(self):
         self.instance = self.resource(ctx=self.ctx)
