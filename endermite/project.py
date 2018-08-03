@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from mcpack import DataPack
 
 from .component import Component, ComponentBuilder
+from .function import FunctionBuilder
 from .resource import ResourceBuilder
 from .utils import import_submodules, name_generator
 
@@ -44,10 +45,12 @@ class ProjectBuilder(ResourceBuilder):
 
     def __init__(self, name, resource):
         super().__init__(None, name, resource)
+        self.namespace = ''
         self.description = ''
-        self.generated_function = name_generator(self.name)
+        self.function_names = name_generator(self.name)
 
     def build(self):
+        self.namespace = self.name
         self.description = (f'{self.resource.description}\n\n'
                             f'Version {self.resource.version}\n'
                             f'By {self.resource.author}')
@@ -57,3 +60,8 @@ class ProjectBuilder(ResourceBuilder):
 
     def create_data_pack(self):
         return DataPack(self.name, self.description)
+
+    def generate_function(self, commands):
+        function_name = next(self.function_names)
+        self.delegate(FunctionBuilder, function_name, commands)
+        return function_name
