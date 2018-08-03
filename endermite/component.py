@@ -54,10 +54,9 @@ class ComponentMethodBuilder(ResourceBuilder):
             self.resource(self.component_instance)
             builder.build()
 
-        if self.resource.data.get('init', False):
-            FunctionData.append_data(self.resource, tag=self.init_callback)
-        if self.resource.data.get('destroy', False):
-            FunctionData.append_data(self.resource, tag=self.destroy_callback)
+        for name, callback in self.component_callbacks.items():
+            if self.resource.data.get(name, False):
+                FunctionData.append_data(self.resource, tag=callback)
 
         tags = self.resource.data.get('tag', [])
         for tag in tags:
@@ -70,12 +69,14 @@ class ComponentBuilder(ResourceBuilder):
     def __init__(self, parent, name, resource):
         super().__init__(parent, name, resource)
         self.component_instance = None
-        self.init_callback = ''
-        self.destroy_callback = ''
+        self.component_callbacks = {
+            'init': f'{self.namespace}:component/callback/init/{self.name}',
+            'destroy': f'{self.namespace}:component/callback/destroy/{self.name}',
+            'tick': f'{self.namespace}:component/callback/tick/{self.name}',
+            'load': f'{self.namespace}:component/callback/load/{self.name}',
+        }
 
     def build(self):
-        self.init_callback = f'{self.namespace}:callback/init/{self.name}'
-        self.destroy_callback = f'{self.namespace}:callback/destroy/{self.name}'
         self.component_instance = self.resource(ctx=self.ctx)
 
         for name, method in self.resource.component_methods.items():
@@ -85,11 +86,18 @@ class ComponentBuilder(ResourceBuilder):
         self.build_attach_function(component_tag)
         self.build_detach_function(component_tag)
 
+        for name in ('tick', 'load'):
+            callback = self.component_callbacks[name]
+            func = self.generate_function([
+                f'execute as @e[tag={component_tag}] run function #{callback}'
+            ])
+            self.delegate(FunctionTagBuilder, f'minecraft:{name}', [func])
+
     def build_attach_function(self, component_tag):
         function_name = f'{self.namespace}:attach/{self.name}'
         func = self.generate_function([
             f'tag @s add {component_tag}',
-            f'function #{self.init_callback}',
+            f'function #{self.component_callbacks["init"]}',
         ])
         self.delegate(FunctionBuilder, function_name, [
             f'execute unless entity @s[tag={component_tag}] run function {func}',
@@ -98,7 +106,7 @@ class ComponentBuilder(ResourceBuilder):
     def build_detach_function(self, component_tag):
         function_name = f'{self.namespace}:detach/{self.name}'
         func = self.generate_function([
-            f'function #{self.destroy_callback}',
+            f'function #{self.component_callbacks["destroy"]}',
             f'tag @s remove {component_tag}',
         ])
         self.delegate(FunctionBuilder, function_name, [
