@@ -29,10 +29,6 @@ class ComponentMeta(type):
                     dct[name] = patched_method(member)
 
         dct['component_methods'] = methods
-        dct['component_tag'] = ''
-        dct['component_function_attach'] = ''
-        dct['component_function_detach'] = ''
-
         return super().__new__(cls, cls_name, bases, dct, *args, **kwargs)
 
     def __init__(cls, cls_name, bases, dct, *args, **kwargs):
@@ -50,7 +46,9 @@ class ComponentMeta(type):
 
 
 class Component(AutoRegisteringResourceClass, CommandMixin, metaclass=ComponentMeta):
-    pass
+    component_tag = ''
+    component_function_attach = ''
+    component_function_detach = ''
 
 
 class ComponentMethodBuilder(ResourceBuilder):
