@@ -30,6 +30,8 @@ class ComponentMeta(type):
 
         dct['component_methods'] = methods
         dct['component_tag'] = ''
+        dct['component_function_attach'] = ''
+        dct['component_function_detach'] = ''
 
         return super().__new__(cls, cls_name, bases, dct, *args, **kwargs)
 
@@ -43,6 +45,8 @@ class ComponentMeta(type):
             FunctionData.update_data(method, function_name=prefix + name)
 
         cls.component_tag = f'{cls.namespace}.component.{cls.name}'
+        cls.component_function_attach = f'{cls.namespace}:attach/{cls.name}'
+        cls.component_function_detach = f'{cls.namespace}:detach/{cls.name}'
 
 
 class Component(AutoRegisteringResourceClass, CommandMixin, metaclass=ComponentMeta):
@@ -99,21 +103,19 @@ class ComponentBuilder(ResourceBuilder):
             self.delegate(FunctionTagBuilder, f'minecraft:{name}', [func])
 
     def build_attach_function(self):
-        function_name = f'{self.namespace}:attach/{self.name}'
         func = self.generate_function([
             f'tag @s add {self.resource.component_tag}',
             f'function #{self.component_callbacks["init"]}',
         ])
-        self.delegate(FunctionBuilder, function_name, [
+        self.delegate(FunctionBuilder, self.resource.component_function_attach, [
             f'execute unless entity @s[tag={self.resource.component_tag}] run function {func}',
         ])
 
     def build_detach_function(self):
-        function_name = f'{self.namespace}:detach/{self.name}'
         func = self.generate_function([
             f'function #{self.component_callbacks["destroy"]}',
             f'tag @s remove {self.resource.component_tag}',
         ])
-        self.delegate(FunctionBuilder, function_name, [
+        self.delegate(FunctionBuilder, self.resource.component_function_detach, [
             f'execute if entity @s[tag={self.resource.component_tag}] run function {func}',
         ])
