@@ -29,6 +29,8 @@ class ComponentMeta(type):
                     dct[name] = patched_method(member)
 
         dct['component_methods'] = methods
+        dct['component_tag'] = ''
+
         return super().__new__(cls, cls_name, bases, dct, *args, **kwargs)
 
     def __init__(cls, cls_name, bases, dct, *args, **kwargs):
@@ -39,6 +41,8 @@ class ComponentMeta(type):
             if method.data['visibility'] == 'private':
                 name = '_private/' + name
             FunctionData.update_data(method, function_name=prefix + name)
+
+        cls.component_tag = f'{cls.namespace}.component.{cls.name}'
 
 
 class Component(AutoRegisteringResourceClass, CommandMixin, metaclass=ComponentMeta):
@@ -84,33 +88,32 @@ class ComponentBuilder(ResourceBuilder):
         for name, method in self.resource.component_methods.items():
             self.delegate(ComponentMethodBuilder, name, method)
 
-        component_tag = f'{self.namespace}.component.{self.name}'
-        self.build_attach_function(component_tag)
-        self.build_detach_function(component_tag)
+        self.build_attach_function()
+        self.build_detach_function()
 
         for name in ('tick', 'load'):
             callback = self.component_callbacks[name]
             func = self.generate_function([
-                f'execute as @e[tag={component_tag}] run function #{callback}'
+                f'execute as @e[tag={self.resource.component_tag}] run function #{callback}'
             ])
             self.delegate(FunctionTagBuilder, f'minecraft:{name}', [func])
 
-    def build_attach_function(self, component_tag):
+    def build_attach_function(self):
         function_name = f'{self.namespace}:attach/{self.name}'
         func = self.generate_function([
-            f'tag @s add {component_tag}',
+            f'tag @s add {self.resource.component_tag}',
             f'function #{self.component_callbacks["init"]}',
         ])
         self.delegate(FunctionBuilder, function_name, [
-            f'execute unless entity @s[tag={component_tag}] run function {func}',
+            f'execute unless entity @s[tag={self.resource.component_tag}] run function {func}',
         ])
 
-    def build_detach_function(self, component_tag):
+    def build_detach_function(self):
         function_name = f'{self.namespace}:detach/{self.name}'
         func = self.generate_function([
             f'function #{self.component_callbacks["destroy"]}',
-            f'tag @s remove {component_tag}',
+            f'tag @s remove {self.resource.component_tag}',
         ])
         self.delegate(FunctionBuilder, function_name, [
-            f'execute if entity @s[tag={component_tag}] run function {func}',
+            f'execute if entity @s[tag={self.resource.component_tag}] run function {func}',
         ])
