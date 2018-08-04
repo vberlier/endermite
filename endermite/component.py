@@ -78,12 +78,9 @@ class ComponentBuilder(ResourceBuilder):
     def __init__(self, parent, name, resource):
         super().__init__(parent, name, resource)
         self.component_instance = None
-        self.namespace = self.resource.namespace
         self.component_callbacks = {
-            'init': f'{self.namespace}:component/callback/init/{self.name}',
-            'destroy': f'{self.namespace}:component/callback/destroy/{self.name}',
-            'tick': f'{self.namespace}:component/callback/tick/{self.name}',
-            'load': f'{self.namespace}:component/callback/load/{self.name}',
+            name: f'{self.resource.namespace}:component/callback/{name}/{self.name}'
+            for name in ('init', 'destroy', 'tick', 'load')
         }
 
     def build(self):

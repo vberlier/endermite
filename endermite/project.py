@@ -45,12 +45,10 @@ class ProjectBuilder(ResourceBuilder):
 
     def __init__(self, name, resource):
         super().__init__(None, name, resource)
-        self.namespace = ''
         self.description = ''
         self.function_names = name_generator(f'{self.name}:generated/{{name}}')
 
     def build(self):
-        self.namespace = self.name
         self.description = (f'{self.resource.description}\n\n'
                             f'Version {self.resource.version}\n'
                             f'By {self.resource.author}')
