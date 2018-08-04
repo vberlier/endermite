@@ -25,3 +25,9 @@ class CommandMixin(ContextAwareMixin):
 
     def say(self, *args, sep=' '):
         self.run('say', sep.join(map(str, args)))
+
+    def attach(self, component_class):
+        self.run('function', component_class.component_function_attach)
+
+    def detach(self, component_class):
+        self.run('function', component_class.component_function_detach)
