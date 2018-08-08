@@ -38,6 +38,13 @@ def destroy(func):
 class FunctionData(dict):
     """Can be attached to a function to store extra information."""
 
+    def update(self, dct):
+        for key, value in dct.items():
+            if isinstance(value, dict) and isinstance(self.get(key, None), dict):
+                FunctionData.update(self[key], value)
+                continue
+            self[key] = value
+
     @classmethod
     def _ensure_data(cls, func):
         if not hasattr(func, 'data'):

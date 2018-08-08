@@ -6,17 +6,21 @@ from .resource import AutoRegisteringResourceClass, ResourceBuilder
 from .function import FunctionBuilder, FunctionTagBuilder
 from .mixins import CommandMixin
 from .decorators import FunctionData
-
-
-def patched_method(method):
-    @wraps(method)
-    def wrapper(self):
-        self.run('function', method.data['function_name'])
-    return wrapper
+from .utils import wrap_function
 
 
 class ComponentMeta(type):
     def __new__(cls, cls_name, bases, dct, *args, **kwargs):
+        methods = cls._extract_methods(dct)
+
+        for base in bases:
+            cls._inherit_parent_methods(methods, base)
+
+        dct['component_methods'] = methods
+        return super().__new__(cls, cls_name, bases, dct, *args, **kwargs)
+
+    @classmethod
+    def _extract_methods(cls, dct):
         defined_members = [name for name in dct if not name.startswith('_')]
         methods = {}
 
@@ -25,20 +29,52 @@ class ComponentMeta(type):
 
             if isinstance(getattr(member, 'data', None), FunctionData):
                 if 'visibility' in member.data:
-                    methods[name] = member
-                    dct[name] = patched_method(member)
+                    wrapper_method = cls._patched_method(member)
+                    dct[name] = wrapper_method
 
-        dct['component_methods'] = methods
-        return super().__new__(cls, cls_name, bases, dct, *args, **kwargs)
+                    if member.data['visibility'] == 'private':
+                        name = '_private/' + name
+
+                    methods[name] = FunctionData.update_data(
+                        member,
+                        wrapper=wrapper_method
+                    )
+
+        return methods
+
+    @classmethod
+    def _patched_method(cls, method):
+        @wraps(method)
+        def wrapper(self):
+            self.run('function', wrapper.data['function_names'][self.__class__])
+        return wrapper
+
+    @classmethod
+    def _inherit_parent_methods(cls, methods, base):
+        for name, method in getattr(base, 'component_methods', {}).items():
+            inherited_name = f'{base.name}/{name}'
+            inherited_method = wrap_function(method)
+
+            if name not in methods:
+                FunctionData.update_data(inherited_method, **method.data)
+
+            methods[inherited_name] = FunctionData.update_data(
+                inherited_method,
+                visibility=method.data['visibility'],
+                wrapper=method.data['wrapper']
+            )
 
     def __init__(cls, cls_name, bases, dct, *args, **kwargs):
         super().__init__(cls_name, bases, dct, *args, **kwargs)
         prefix = f'{cls.namespace}:component/{cls.name}/'
 
         for name, method in cls.component_methods.items():
-            if method.data['visibility'] == 'private':
-                name = '_private/' + name
-            FunctionData.update_data(method, function_name=prefix + name)
+            full_name = prefix + name
+            FunctionData.update_data(method, function_name=full_name)
+            FunctionData.update_data(
+                method.data['wrapper'],
+                function_names={cls: full_name}
+            )
 
         cls.component_tag = f'{cls.namespace}.component.{cls.name}'
         cls.component_function_attach = f'{cls.namespace}:attach/{cls.name}'
