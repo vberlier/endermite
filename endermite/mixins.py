@@ -27,7 +27,11 @@ class CommandMixin(ContextAwareMixin):
         self.run('say', sep.join(map(str, args)))
 
     def attach(self, component_class):
+        if component_class.abstract:
+            raise TypeError('Abstract components cannot be attached')
         self.run('function', component_class.component_function_attach)
 
     def detach(self, component_class):
+        if component_class.abstract:
+            raise TypeError('Abstract components cannot be detached')
         self.run('function', component_class.component_function_detach)

@@ -16,21 +16,29 @@ def clear_registries():
 class AutoRegisteringResourceClass:
     """Auto-register class-based project resources when subclassed."""
     registries = []
+    abstract = True
     namespace = ''
     name = ''
 
-    def __init_subclass__(cls, namespace=None):
+    def __init_subclass__(cls, namespace=None, abstract=False):
         if cls.__base__ is AutoRegisteringResourceClass:
             cls.registry = defaultdict(dict)
             cls.registries.append(cls.registry)
             return
 
+        if not getattr(cls.__base__, 'abstract', False):
+            raise TypeError(f'Cannot inherit from non-abstract resource class')
+
+        cls.abstract = abstract
+        cls.namespace = namespace or cls.__module__.partition('.')[0]
+        cls.name = underscore(cls.__name__)
+
+        if cls.abstract:
+            return
+
         registry = getattr(cls, 'registry', None)
         if registry is None:
             return
-
-        cls.namespace = namespace or cls.__module__.partition('.')[0]
-        cls.name = underscore(cls.__name__)
 
         resources = registry[cls.namespace]
         if cls.name in resources:
