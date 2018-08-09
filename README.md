@@ -12,12 +12,11 @@
 
 [Minecraft data packs](https://minecraft.gamepedia.com/Data_pack) make it possible for anyone to customize the game by writing bits of JSON and a few functions. The underlying format is simple and straight-forward, making it easy to parse, but it hasn't been created with a specific developer experience in mind. When you sit down in front of your text editor, it can be hard to figure out how you're supposed to make use of the available features to do what you want to do.
 
-Endermite is a python framework that combines and exposes data pack features through a level of abstraction. It aims to make it easier to develop, encapsulate and compose behavior by providing a component-based approach.
+Endermite is a python framework that combines and exposes data pack features through a layer of abstraction. It aims to make it easier to develop, encapsulate and compose behavior by providing a component-based approach.
 
 ```python
 from endermite import Component
 from endermite.decorators import public, tick
-
 
 class Hello(Component):
     """Output `Hello, world!` each tick when attached to an entity."""
@@ -43,6 +42,81 @@ You can check that endermite is correctly installed by trying to use the command
 ```sh
 $ ender --version
 ```
+
+## Getting started
+
+The easiest way to get started with endermite is to get familiar with the command-line workflow. You can use endermite without it but the `ender` CLI will usually allow you to be much more productive.
+
+```sh
+$ ender --help
+Usage: ender [OPTIONS] COMMAND [ARGS]...
+
+  Command-line utility to manage endermite projects.
+
+Options:
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+
+Commands:
+  build  Build all the projects of the current world.
+  init   Create a new endermite project.
+```
+
+### Creating a new project
+
+The `ender` CLI lets you create an endermite project inside of a Minecraft world folder by running the `init` command. Note that you can create as many endermite projects as you want in the same world.
+
+```sh
+$ ender init
+endermite vX.X.X
+
+Creating endermite project.
+
+Project name [testing_endermite]: tutorial
+Project description [An endermite project]:
+Project author [N/A]:
+Project version [0.1.0]:
+
+About to create .../.minecraft/saves/testing_endermite/@endermite/tutorial.
+
+Is this ok? [Y/n]:
+
+Done!
+```
+
+The project created by the `ender` CLI is simply a python package that exports an endermite `Project` object.
+
+### Building your endermite projects
+
+You can use the `build` command to build all the projects you created in a specific Minecraft world. The command will output the corresponding data packs in the `datapacks` directory.
+
+```sh
+$ ender build
+endermite vX.X.X
+
+Building endermite projects.
+
+Attempting to build "tutorial"...
+Done! (took X.XXXs)
+```
+
+Running the `build` command with the `--watch` option will rebuild your projects whenever you make modifications to the `@endermite` directory. It lets you forget about having to run the `build` command manually.
+
+```sh
+$ ender build --watch
+endermite vX.X.X
+
+Building endermite projects.
+
+Watching directory .../.minecraft/saves/testing_endermite/@endermite.
+
+HH:MM:SS X changes detected
+
+Attempting to build "tutorial"...
+Done! (took X.XXXs)
+```
+
+Remember that you still need to run `/reload` in-game.
 
 ## Contributing
 
