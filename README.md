@@ -8,6 +8,20 @@
 
 **🚧 This is a huge work in progress 🚧**
 
+## Installation
+
+Make sure that you're using Python 3.7 or above. You can install endermite with `pip`.
+
+```sh
+$ pip install endermite
+```
+
+You can check that endermite is correctly installed by trying to use the command-line interface shipped with the package.
+
+```sh
+$ ender --version
+```
+
 ## Contributing
 
 Contributions are welcome. Make sure that Python 3.7 or newer is installed and create a virtual environment in the project directory.
