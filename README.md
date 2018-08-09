@@ -8,6 +8,28 @@
 
 **🚧 This is a huge work in progress 🚧**
 
+## Introduction
+
+[Minecraft data packs](https://minecraft.gamepedia.com/Data_pack) make it possible for anyone to customize the game by writing bits of JSON and a few functions. The underlying format is simple and straight-forward, making it easy to parse, but it hasn't been created with a specific developer experience in mind. When you sit down in front of your text editor, it can be hard to figure out how you're supposed to make use of the available features to do what you want to do.
+
+Endermite is a python framework that combines and exposes data pack features through a level of abstraction. It aims to make it easier to develop, encapsulate and compose behavior by providing a component-based approach.
+
+```python
+from endermite import Component
+from endermite.decorators import public, tick
+
+
+class Hello(Component):
+    """Output `Hello, world!` each tick when attached to an entity."""
+
+    @tick
+    @public
+    def say_hello(self):
+        self.say('Hello, world!')
+```
+
+Components are coupled pieces of state and behavior that can be attached to entities. They're conceptually similar to what you might be used to with `MonoBehaviour` scripts if you've worked with the Unity game engine.
+
 ## Installation
 
 Make sure that you're using Python 3.7 or above. You can install endermite with `pip`.
