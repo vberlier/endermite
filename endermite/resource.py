@@ -26,7 +26,7 @@ class AutoRegisteringResourceClass:
             cls.registries.append(cls.registry)
             return
 
-        if not getattr(cls.__base__, 'abstract', False):
+        if any(base for base in cls.__bases__ if not getattr(base, 'abstract', False)):
             raise TypeError(f'Cannot inherit from non-abstract resource class')
 
         cls.abstract = abstract
