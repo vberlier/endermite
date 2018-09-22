@@ -58,12 +58,3 @@ def delete_cache(package):
                if mod == package or mod.startswith(package + '.')]
     for mod in modules:
         del sys.modules[mod]
-
-
-# Misc
-
-
-def wrap_function(func):
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-    return wrapper

@@ -1,17 +1,14 @@
 __all__ = ['Component', 'ComponentBuilder']
 
-from functools import wraps
-
 from .resource import AutoRegisteringResourceClass, ResourceBuilder
+from .component_method import ComponentMethod, ComponentMethodBuilder
 from .function import FunctionBuilder, FunctionTagBuilder
 from .mixins import CommandMixin
-from .decorators import FunctionData
-from .utils import wrap_function
 
 
 class ComponentMeta(type):
     def __new__(cls, cls_name, bases, dct, *args, **kwargs):
-        methods = cls._extract_methods(dct)
+        methods = dict(cls._extract_methods(dct))
 
         for base in bases:
             cls._inherit_parent_methods(methods, base)
@@ -22,46 +19,21 @@ class ComponentMeta(type):
     @classmethod
     def _extract_methods(cls, dct):
         defined_members = [name for name in dct if not name.startswith('_')]
-        methods = {}
 
         for name in defined_members:
             member = dct[name]
-
-            if isinstance(getattr(member, 'data', None), FunctionData):
-                if 'visibility' in member.data:
-                    wrapper_method = cls._patched_method(member)
-                    dct[name] = wrapper_method
-
-                    if member.data['visibility'] == 'private':
-                        name = '_private/' + name
-
-                    methods[name] = FunctionData.update_data(
-                        member,
-                        wrapper=wrapper_method
-                    )
-
-        return methods
-
-    @classmethod
-    def _patched_method(cls, method):
-        @wraps(method)
-        def wrapper(self):
-            self.run('function', wrapper.data['function_names'][self.__class__])
-        return wrapper
+            if isinstance(member, ComponentMethod):
+                if member.visibility == 'private':
+                    name = '_private/' + name
+                yield name, member
 
     @classmethod
     def _inherit_parent_methods(cls, methods, base):
         for name, method in getattr(base, 'component_methods', {}).items():
             inherited_name = f'{base.name}/{name}'
-            inherited_method = wrap_function(method)
-
-            if name not in methods:
-                FunctionData.update_data(inherited_method, **method.data)
-
-            methods[inherited_name] = FunctionData.update_data(
-                inherited_method,
-                visibility=method.data['visibility'],
-                wrapper=method.data['wrapper']
+            methods[inherited_name] = method.inherit(
+                inherited_name,
+                overwritten=name in methods
             )
 
     def __init__(cls, cls_name, bases, dct, *args, **kwargs):
@@ -70,11 +42,8 @@ class ComponentMeta(type):
 
         for name, method in cls.component_methods.items():
             full_name = prefix + name
-            FunctionData.update_data(method, function_name=full_name)
-            FunctionData.update_data(
-                method.data['wrapper'],
-                function_names={cls: full_name}
-            )
+            method.function_name = full_name
+            method.aliases[cls] = full_name
 
         cls.component_tag = f'{cls.namespace}.component.{cls.name}'
         cls.component_function_attach = f'{cls.namespace}:attach/{cls.name}'
@@ -85,25 +54,6 @@ class Component(AutoRegisteringResourceClass, CommandMixin, metaclass=ComponentM
     component_tag = ''
     component_function_attach = ''
     component_function_detach = ''
-
-
-class ComponentMethodBuilder(ResourceBuilder):
-    guard_name = 'component method'
-
-    def build(self):
-        function_name = self.resource.data['function_name']
-        with FunctionBuilder(self, function_name, []).current() as builder:
-            self.resource(self.component_instance)
-            builder.build()
-
-        tags = self.resource.data.get('tag', [])
-
-        for name, callback in self.component_callbacks.items():
-            if self.resource.data.get(name, False):
-                tags.append(callback)
-
-        for tag in tags:
-            self.delegate(FunctionTagBuilder, tag, [function_name])
 
 
 class ComponentBuilder(ResourceBuilder):
