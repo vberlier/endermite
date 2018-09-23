@@ -11,7 +11,7 @@ with open('requirements.txt') as requirements:
 
 setup(
     name='endermite',
-    version='0.0.3',
+    version='0.0.4',
     license='MIT',
     description='A high-level, opinionated python framework for building Minecraft data packs',
     long_description=long_description,
