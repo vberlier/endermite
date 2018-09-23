@@ -6,3 +6,4 @@ disable =
     too-few-public-methods,
     todo,
     fixme,
+    stop-iteration-return,

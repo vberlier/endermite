@@ -6,7 +6,6 @@ from functools import wraps, partial
 
 from .resource import ResourceBuilder
 from .function import FunctionBuilder, FunctionTagBuilder
-from .command import ExecutionContext
 
 
 @dataclass

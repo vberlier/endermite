@@ -58,7 +58,7 @@ class CommandMixin(ChatCommandMixin):
     def __enter__(self):
         frame = self._using_execution_context()
         self._stack.append(frame)
-        return frame.__enter__()
+        return frame.__enter__() # pylint: disable = no-member
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         frame = self._stack.pop()
