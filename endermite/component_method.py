@@ -48,7 +48,7 @@ class ComponentMethod:
         )
 
     def _call_function(self, component):
-        component.run('function', self.aliases[type(component)])
+        component.run('function', self.aliases[type(component)]) # pylint: disable = unsubscriptable-object
 
 
 class ComponentMethodBuilder(ResourceBuilder):
