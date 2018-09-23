@@ -1,12 +1,7 @@
 __all__ = ['CommandMixin']
 
-from .function import FunctionBuilder
-
-
-class ContextAwareMixin:
-    def __init__(self, *args, ctx, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.ctx = ctx
+from ..function import FunctionBuilder
+from .chat import ChatCommandMixin
 
 
 class Command(tuple):
@@ -17,11 +12,12 @@ class Command(tuple):
         return ' '.join(str(arg).replace('\n', ' ').strip() for arg in self)
 
 
-class CommandMixin(ContextAwareMixin):
+class CommandMixin(ChatCommandMixin):
     """Expose context-modifying methods that mirror minecraft commands."""
+
+    def __init__(self, *args, ctx, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ctx = ctx
 
     def run(self, *args):
         self.ctx[FunctionBuilder].register_command(Command(args))
-
-    def say(self, *args, sep=' '):
-        self.run('say', sep.join(map(str, args)))

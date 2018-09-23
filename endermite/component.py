@@ -3,7 +3,7 @@ __all__ = ['Component', 'ComponentBuilder']
 from .resource import AutoRegisteringResourceClass, ResourceBuilder
 from .component_method import ComponentMethod, ComponentMethodBuilder
 from .function import FunctionBuilder, FunctionTagBuilder
-from .mixins import CommandMixin
+from .commands import CommandMixin
 
 
 class ComponentMeta(type):
