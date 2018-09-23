@@ -44,13 +44,13 @@ class ComponentMethod:
 
         return method
 
-    def __get__(self, component, component_type):
+    def __get__(self, component, _component_type):
         return wraps(self.function)(
-            partial(component.run, 'function', self.aliases[component_type])
+            partial(self._call_function, *filter(None, [component]))
         )
 
-    def __set__(self, _obj, _value):
-        raise AttributeError()
+    def _call_function(self, component):
+        component.run('function', self.aliases[type(component)])
 
 
 class ComponentMethodBuilder(ResourceBuilder):
