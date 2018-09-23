@@ -1,9 +1,9 @@
-__all__ = ['ChatCommandMixin']
+__all__ = ['BasicCommandMixin']
 
 import json
 
 
-class ChatCommandMixin:
+class BasicCommandMixin:
     def say(self, *args, sep=' '):
         self.run('say', sep.join(map(str, args)))
 
@@ -15,3 +15,9 @@ class ChatCommandMixin:
 
     def error(self, *args, sep=' '):
         self.log(*args, sep, color='red', prefix='[ERR]')
+
+    def add_tag(self, tag):
+        self.run('tag', '@s', 'add', tag)
+
+    def remove_tag(self, tag):
+        self.run('tag', '@s', 'remove', tag)

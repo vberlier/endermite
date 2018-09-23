@@ -19,7 +19,7 @@ class ComponentMethod:
     destroy: bool = False
     function: Callable = None
     function_name: str = ''
-    aliases: Dict[type, str] = field(default_factory=dict, init=False)
+    aliases: Dict[type, str] = field(default_factory=dict)
 
     @classmethod
     def apply(cls, method, **kwargs):
@@ -39,8 +39,6 @@ class ComponentMethod:
             method.load = False
             method.init = False
             method.destroy = False
-        else:
-            method.aliases = self.aliases
 
         return method
 
@@ -71,10 +69,10 @@ class ComponentMethodBuilder(ResourceBuilder):
             )
 
             with component.execute(('unless', 'entity', selector)):
-                component.run('tag', '@s', 'add', identifier)
+                component.add_tag(identifier)
                 with component.execute(('as', selector)) as scope:
                     function(scope)
-                component.run('tag', '@s', 'remove', identifier)
+                component.remove_tag(identifier)
 
             builder.build()
 

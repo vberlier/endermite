@@ -3,7 +3,7 @@ __all__ = ['CommandMixin']
 from contextlib import contextmanager
 
 from ..function import FunctionBuilder
-from .chat import ChatCommandMixin
+from .basic import BasicCommandMixin
 
 
 class Command(tuple):
@@ -21,7 +21,7 @@ class ExecutionContext(tuple):
         return self and ('execute', *sum(self, ()), 'run')
 
 
-class CommandMixin(ChatCommandMixin):
+class CommandMixin(BasicCommandMixin):
     """Expose context-modifying methods that mirror minecraft commands."""
 
     def __init__(self, *args, ctx, execution_context=None, **kwargs):
