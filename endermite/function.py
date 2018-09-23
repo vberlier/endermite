@@ -21,6 +21,7 @@ class FunctionBuilder(ResourceBuilder):
         self.function_body += '\n'.join(map(str, self.resource)) + '\n'
 
     def populate(self, pack):
+        super().populate(pack)
         pack[self.name] = Function(self.function_body)
 
 
@@ -35,6 +36,7 @@ class FunctionTagBuilder(ResourceBuilder):
         self.values.extend(map(str, self.resource))
 
     def populate(self, pack):
+        super().populate(pack)
         namespace, name = self.name.split(':')
         tags = pack[namespace].function_tags
 
