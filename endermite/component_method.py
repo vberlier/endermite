@@ -58,6 +58,7 @@ class ComponentMethodBuilder(ResourceBuilder):
 
     def build(self):
         function_name = self.resource.function_name
+        function = self.resource.function
 
         with FunctionBuilder(self, function_name, []).current() as builder:
             identifier = next(self.tag_names)
@@ -65,13 +66,14 @@ class ComponentMethodBuilder(ResourceBuilder):
             component = self.component_instance
 
             component.execute(('if', 'entity', selector)).error(
-                'Recursive method invocation', function_name
+                'Recursive method invocation', f'"{function.__qualname__}()"',
+                'in module', f'"{function.__module__}"'
             )
 
             with component.execute(('unless', 'entity', selector)):
                 component.run('tag', '@s', 'add', identifier)
                 with component.execute(('as', selector)) as scope:
-                    self.resource.function(scope)
+                    function(scope)
                 component.run('tag', '@s', 'remove', identifier)
 
             builder.build()
