@@ -27,7 +27,7 @@ class AutoRegisteringResourceClass:
             return
 
         if any(base for base in cls.__bases__ if not getattr(base, 'abstract', False)):
-            raise TypeError(f'Cannot inherit from non-abstract resource class')
+            raise TypeError('Cannot inherit from non-abstract resource class')
 
         cls.abstract = abstract
         cls.namespace = namespace or cls.__module__.partition('.')[0]
@@ -52,6 +52,9 @@ class ResourceBuilder(list):
 
     def __init__(self, parent, name, resource):
         super().__init__()
+        if getattr(resource, 'abstract', False):
+            raise TypeError('Cannot build abstract resource')
+
         self.name = name
         self.resource = resource
         self.parent = parent
