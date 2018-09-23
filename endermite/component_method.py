@@ -6,6 +6,7 @@ from functools import wraps, partial
 
 from .resource import ResourceBuilder
 from .function import FunctionBuilder, FunctionTagBuilder
+from .command import ExecutionContext
 
 
 @dataclass
@@ -60,7 +61,14 @@ class ComponentMethodBuilder(ResourceBuilder):
         function_name = self.resource.function_name
 
         with FunctionBuilder(self, function_name, []).current() as builder:
-            self.resource.function(self.component_instance)
+            identifier = next(self.tag_names)
+            component = self.component_instance
+            component.run('tag', '@s', 'add', identifier)
+
+            with component.execute(('as', f'@e[tag={identifier}]')) as scope:
+                self.resource.function(scope)
+
+            component.run('tag', '@s', 'remove', identifier)
             builder.build()
 
         for name, callback in self.component_callbacks.items():

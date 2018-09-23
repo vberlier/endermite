@@ -47,6 +47,7 @@ class ProjectBuilder(ResourceBuilder):
         super().__init__(None, name, resource)
         self.description = ''
         self.function_names = name_generator(f'{self.name}:generated/{{name}}')
+        self.tag_names = name_generator(f'{self.name}.generated.{{name}}')
 
     def build(self):
         self.description = (f'{self.resource.description}\n\n'
