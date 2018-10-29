@@ -43,13 +43,13 @@ def import_submodules(package):
 
         if is_resource(package, name):
             if name.endswith('.py'):
-                import_module(f'{package}.{name[:-3]}')
+                import_submodules(f'{package}.{name[:-3]}')
         else:
             try:
                 contents(f'{package}.{name}')
             except TypeError:
                 continue
-            import_module(f'{package}.{name}')
+            import_submodules(f'{package}.{name}')
 
 
 def delete_cache(package):
