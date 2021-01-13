@@ -1,9 +1,0 @@
-[MESSAGES CONTROL]
-
-disable =
-    missing-docstring,
-    wrong-import-order,
-    too-few-public-methods,
-    todo,
-    fixme,
-    stop-iteration-return,
